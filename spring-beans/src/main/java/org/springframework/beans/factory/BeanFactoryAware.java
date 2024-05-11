@@ -19,6 +19,10 @@ package org.springframework.beans.factory;
 import org.springframework.beans.BeansException;
 
 /**
+ * 实现了 BeanFactoryAware 接口的 bean 可以获取其所属的 bean 工厂（即 Spring 容器）。
+ * 当 Spring 容器创建该 bean 的实例后，会调用 setBeanFactory 方法，将该实例所属的 bean 工厂传递给它。
+ * 通过实现该接口，你可以在 bean 内部获取对 bean 工厂的引用，进一步使用容器提供的功能或访问其他 bean
+ *
  * Interface to be implemented by beans that wish to be aware of their
  * owning {@link BeanFactory}.
  *

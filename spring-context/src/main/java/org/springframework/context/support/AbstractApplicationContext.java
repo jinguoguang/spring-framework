@@ -17,15 +17,9 @@
 package org.springframework.context.support;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
@@ -72,6 +66,7 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.StandardEnvironment;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -516,20 +511,38 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	@Override
 	public void refresh() throws BeansException, IllegalStateException {
 		synchronized (this.startupShutdownMonitor) {
-			// Prepare this context for refreshing.
+			/**
+			 * 【1】准备刷新
+			 *  (1) 设置容器启动时间
+			 *  (2) 设置活跃状态为true
+			 *  (3) 设置关闭状态为false
+			 *  (4) 获取Environment对象，校验配置文件
+			 *  (5) 准本监听器和事件的集合对象，默认为空set集合
+
+			 */
 			prepareRefresh();
 
-			// Tell the subclass to refresh the internal bean factory.
+			/**
+			 * 【2.初始化 新BeanFactory】 重点
+			 *  (1) 存在旧BeanFactory 则销毁
+			 *  (2) 创建新BeanFactory (DefaluListbaleBeanFactory)
+			 *  (3) 解析xml/加载Bean定义、注册Bean定义到BeanFactory
+			 *  (4) 返回新的BeanFactory
+			 */
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
-			// Prepare the bean factory for use in this context.
+			/**
+			 * 【3.bean工厂前置操作】
+			 *  为BeanFactory配置容器特性
+			 *  比如类加载器，表达式解析器，注册默认环境Bean、后置管理器BeanPostProcessor
+			 */
 			prepareBeanFactory(beanFactory);
 
 			try {
 				// Allows post-processing of the bean factory in context subclasses.
 				postProcessBeanFactory(beanFactory);
 
-				// Invoke factory processors registered as beans in the context.
+				//【5.调用bean工厂后置处理器】开始调用我们自己实现的接口
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
@@ -583,9 +596,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * active flag as well as performing any initialization of property sources.
 	 */
 	protected void prepareRefresh() {
-		// Switch to active.
+		// 设置启动时间
 		this.startupDate = System.currentTimeMillis();
+		//设置关闭状态为false
 		this.closed.set(false);
+		//设置活跃表示为true
 		this.active.set(true);
 
 		if (logger.isDebugEnabled()) {
@@ -597,35 +612,62 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			}
 		}
 
-		// Initialize any placeholder property sources in the context environment.
+		// 初始化上下文环境中的任何占位符属性源,对于子类:默认情况下什么都不做,可以自定义ApplicationContext重写这个方法
 		initPropertySources();
 
 		// Validate that all properties marked as required are resolvable:
 		// see ConfigurablePropertyResolver#setRequiredProperties
+		// 获取Environment对象，进行环境属性校验
 		getEnvironment().validateRequiredProperties();
 
-		// Store pre-refresh ApplicationListeners...
+		// 存储 预刷新监听器集合
 		if (this.earlyApplicationListeners == null) {
+			//将当前的应用程序监听器 this.applicationListeners 复制到 this.earlyApplicationListeners
 			this.earlyApplicationListeners = new LinkedHashSet<>(this.applicationListeners);
 		}
 		else {
-			// Reset local application listeners to pre-refresh state.
+			/**
+			 * 如果存在则清空 this.applicationListeners并重新添加到 this.applicationListeners
+			 * 目的是为了在刷新过程之前，将预刷新的应用程序监听器存储起来。
+			 * 这些监听器在刷新过程中可能会被重新注册，所以将它们在刷新之前进行备份是为了后续重新注册时能保持一致性和正确性
+			 * why do this?
+			 * 比如说 在执行refresh方法时 有两个监听器 一个用于在每个请求到达时记录请求日志 另一个用于在异常发生时发送邮件通知管理员
+			 * 在刷新方法的时候，假如移除了一个记录接口请求的监听器 但是出问题了 导致日志记录失败或者管理员未能及时收到异常通知
+			 * 备份之前的所有的监听器 在错误后能够使用之前正确配置的监听器集合 避免应用程序出现不可预测的问题
+			 */
 			this.applicationListeners.clear();
 			this.applicationListeners.addAll(this.earlyApplicationListeners);
 		}
 
 		// Allow for the collection of early ApplicationEvents,
 		// to be published once the multicaster is available...
+		//准备事件的集合对象，事件默认为空set集合
 		this.earlyApplicationEvents = new LinkedHashSet<>();
 	}
 
 	/**
+	 * 	对于子类:默认情况下什么都不做
 	 * <p>Replace any stub property sources with actual instances.
 	 * @see org.springframework.core.env.PropertySource.StubPropertySource
 	 * @see org.springframework.web.context.support.WebApplicationContextUtils#initServletPropertySources
 	 */
 	protected void initPropertySources() {
-		// For subclasses: do nothing by default.
+
+		System.out.println("自定义实现initPropertySources 让子类实现 ---初始化上下文环境中的任何占位资源符");
+		ClassPathResource classPathResource = new ClassPathResource("database.properties");
+
+		try {
+			InputStream stream = classPathResource.getInputStream();
+			Properties properties = new Properties();
+			properties.load(stream);
+			String username = properties.getProperty("username");
+			String password = properties.getProperty("password");
+			System.out.println("username = " + username);
+			System.out.println("password = " + password);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
 	}
 
 	/**

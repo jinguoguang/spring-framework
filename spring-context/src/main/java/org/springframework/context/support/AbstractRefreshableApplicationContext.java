@@ -119,15 +119,26 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 */
 	@Override
 	protected final void refreshBeanFactory() throws BeansException {
+		// 检查容器当前是否持有BeanFactory对象
 		if (hasBeanFactory()) {
-			destroyBeans();
-			closeBeanFactory();
+			destroyBeans(); //销毁
+			closeBeanFactory(); //关闭旧BeanFactory
 		}
 		try {
+			/**
+			 * 创建一个新的 beanFactory
+			 * DefaultListableBeanFactory 的构造方法中会设置一些忽略的bean类型如下:
+			 *   BeanNameAware、BeanFactoryAware、BeanClassLoaderAware
+			 * 以上着三个类型维护在 beanFactory 的ignoredDependencyInterfaces参数中 这几个类会忽略 依赖检查 和 自动装配
+			 */
 			DefaultListableBeanFactory beanFactory = createBeanFactory();
+			//设置序列化id
 			beanFactory.setSerializationId(getId());
+			//初始化循环依赖 和 依赖覆盖配置
 			customizeBeanFactory(beanFactory);
+			//加载bean定义到 beanFactory(从配置文件中)
 			loadBeanDefinitions(beanFactory);
+			// 设置beanFactory属性
 			this.beanFactory = beanFactory;
 		}
 		catch (IOException ex) {

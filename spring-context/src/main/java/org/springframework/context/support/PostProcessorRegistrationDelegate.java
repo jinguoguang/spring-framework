@@ -53,6 +53,11 @@ final class PostProcessorRegistrationDelegate {
 	}
 
 
+	/**
+	 * 调用bean工厂后置处理器
+	 * @param beanFactory
+	 * @param beanFactoryPostProcessors
+	 */
 	public static void invokeBeanFactoryPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, List<BeanFactoryPostProcessor> beanFactoryPostProcessors) {
 
@@ -83,16 +88,21 @@ final class PostProcessorRegistrationDelegate {
 			List<BeanDefinitionRegistryPostProcessor> currentRegistryProcessors = new ArrayList<>();
 
 			// First, invoke the BeanDefinitionRegistryPostProcessors that implement PriorityOrdered.
+			//2.查询BeanDefinitionRegistryPostProcessor类型的后置处理器
 			String[] postProcessorNames =
 					beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
+			//3.先处理继承了PriorityOrdered类的
 			for (String ppName : postProcessorNames) {
 				if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {
 					currentRegistryProcessors.add(beanFactory.getBean(ppName, BeanDefinitionRegistryPostProcessor.class));
 					processedBeans.add(ppName);
 				}
 			}
+			////4.对筛选出的类进行排序(getOrder根据方法)
 			sortPostProcessors(currentRegistryProcessors, beanFactory);
+			//5.将筛出来的后置处理器放入注册列表(后面要统一调BeanDefinitionRegistryPostProcessor 的 postProcessBeanFactory)
 			registryProcessors.addAll(currentRegistryProcessors);
+			//6.执行筛选列表的postProcessBeanDefinitionRegistry方法
 			invokeBeanDefinitionRegistryPostProcessors(currentRegistryProcessors, registry);
 			currentRegistryProcessors.clear();
 

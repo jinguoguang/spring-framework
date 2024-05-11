@@ -17,6 +17,9 @@
 package org.springframework.beans.factory;
 
 /**
+ * 实现了 BeanClassLoaderAware 接口的 bean 可以获取其所使用的类加载器。当 Spring 容器创建该 bean 的实例后，
+ * 会调用 setBeanClassLoader 方法，将该实例所使用的类加载器传递给它。
+ * 通过实现该接口，你可以在 bean 内部获取对类加载器的引用，以便进行类加载、反射或其他相关操作
  * Callback that allows a bean to be aware of the bean
  * {@link ClassLoader class loader}; that is, the class loader used by the
  * present bean factory to load bean classes.

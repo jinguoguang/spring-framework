@@ -17,6 +17,9 @@
 package org.springframework.beans.factory;
 
 /**
+ * 实现了 BeanNameAware 接口的 bean 可以获取其在 Spring 容器中的名字。
+ * 当 Spring 容器创建该 bean 的实例后，会调用 setBeanName 方法，将该实例在容器中的名字传递给它。
+ * 通过实现该接口，你可以在 bean 内部获取自身在容器中的名字，以便做进一步的操作或管理。
  * Interface to be implemented by beans that want to be aware of their
  * bean name in a bean factory. Note that it is not usually recommended
  * that an object depends on its bean name, as this represents a potentially
