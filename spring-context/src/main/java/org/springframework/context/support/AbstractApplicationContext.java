@@ -653,20 +653,20 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void initPropertySources() {
 
-		System.out.println("自定义实现initPropertySources 让子类实现 ---初始化上下文环境中的任何占位资源符");
-		ClassPathResource classPathResource = new ClassPathResource("database.properties");
-
-		try {
-			InputStream stream = classPathResource.getInputStream();
-			Properties properties = new Properties();
-			properties.load(stream);
-			String username = properties.getProperty("username");
-			String password = properties.getProperty("password");
-			System.out.println("username = " + username);
-			System.out.println("password = " + password);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		// System.out.println("自定义实现initPropertySources 让子类实现 ---初始化上下文环境中的任何占位资源符");
+		// ClassPathResource classPathResource = new ClassPathResource("database.properties");
+		//
+		// try {
+		// 	InputStream stream = classPathResource.getInputStream();
+		// 	Properties properties = new Properties();
+		// 	properties.load(stream);
+		// 	String username = properties.getProperty("username");
+		// 	String password = properties.getProperty("password");
+		// 	System.out.println("username = " + username);
+		// 	System.out.println("password = " + password);
+		// } catch (IOException e) {
+		// 	throw new RuntimeException(e);
+		// }
 
 	}
 

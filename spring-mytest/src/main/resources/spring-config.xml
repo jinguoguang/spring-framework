@@ -4,6 +4,18 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 
-    <bean id="user" class="com.king.entity.User"></bean>
+    <bean id="user" class="com.king.entity.User">
+
+        <!--
+        property:通过成员变量的setXxx()方法进行赋值
+        name:设置需要赋值的属性名 (和set方法有关)
+        value:设置为属性所赋的值
+         -->
+
+        <property name="id" value="10000" ></property>
+        <property name="name" value="张三"></property>
+        <property name="age" value="18"></property>
+        <property name="gender" value="男"></property>
+    </bean>
 
 </beans>

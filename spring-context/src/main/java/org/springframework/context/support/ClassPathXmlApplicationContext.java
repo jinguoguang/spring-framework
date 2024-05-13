@@ -141,6 +141,7 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 		super(parent);
 		setConfigLocations(configLocations);
 		if (refresh) {
+			//读取 xml 文件，并将 Bean 注入
 			refresh();
 		}
 	}

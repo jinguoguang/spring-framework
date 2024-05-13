@@ -21,9 +21,18 @@ public class Main {
         redisConfig.say();
         //配置文件方式
         ApplicationContext beanFactory = new ClassPathXmlApplicationContext("spring-config.xml");
-        //判断容器是否含有指定名字的
-        boolean admin = beanFactory.containsBean("admin");
-        System.out.println("admin is exiest " + admin);
+        /**
+         * 获取bean的三种方式
+         * 1、根据bean的id获取
+         * 2、根据bean的类型获取
+         * 3、根据bean的 id和type获取
+         */
+        //根据id获取
+        User user1 = (User) beanFactory.getBean("user");
+        System.out.println("user1 = " + user1);
+        // 根据类型获取
+        User user2 = beanFactory.getBean(User.class);
+        //根据id和类型获取
         User user = beanFactory.getBean("user", User.class);
 
         // Resource resource = new ClassPathResource("spring-config.xml");
@@ -35,7 +44,6 @@ public class Main {
         for (Map.Entry<String, PayService> entry : beansOfType.entrySet()) {
             entry.getValue().pay();
         }
-        System.out.println("beansOfType = " + beansOfType);
         System.out.println("Hello world!");
     }
 }
