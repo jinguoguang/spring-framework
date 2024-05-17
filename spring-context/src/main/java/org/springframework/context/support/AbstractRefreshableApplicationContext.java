@@ -119,9 +119,9 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 */
 	@Override
 	protected final void refreshBeanFactory() throws BeansException {
-		// 检查容器当前是否持有BeanFactory对象
+		// 检查容器当前是否持有BeanFactory对象,如果存在Bean工厂，销毁已有的 Bean 并关闭 Bean 工厂
 		if (hasBeanFactory()) {
-			destroyBeans(); //销毁
+			destroyBeans(); //销毁 bean
 			closeBeanFactory(); //关闭旧BeanFactory
 		}
 		try {
@@ -132,16 +132,17 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 			 * 以上着三个类型维护在 beanFactory 的ignoredDependencyInterfaces参数中 这几个类会忽略 依赖检查 和 自动装配
 			 */
 			DefaultListableBeanFactory beanFactory = createBeanFactory();
-			//设置序列化id
+			//设置序列化id为容器的id
 			beanFactory.setSerializationId(getId());
 			//初始化循环依赖 和 依赖覆盖配置
 			customizeBeanFactory(beanFactory);
-			//加载bean定义到 beanFactory(从配置文件中)
+			//加载bean定义到 beanFactory(从配置文件中)，包括读取配置文件、解析 bean 的定义等
 			loadBeanDefinitions(beanFactory);
-			// 设置beanFactory属性
+			// 将创建好的 bean 工厂赋值给容器
 			this.beanFactory = beanFactory;
 		}
 		catch (IOException ex) {
+			// 如果在解析 bean 定义时发生 I/O 错误，则抛出 ApplicationContextException 异常
 			throw new ApplicationContextException("I/O error parsing bean definition source for " + getDisplayName(), ex);
 		}
 	}

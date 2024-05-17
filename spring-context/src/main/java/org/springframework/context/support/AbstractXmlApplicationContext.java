@@ -79,18 +79,19 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 	 */
 	@Override
 	protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws BeansException, IOException {
-		// Create a new XmlBeanDefinitionReader for the given BeanFactory.
+		// 为给定的BeanFactory 创建一个 XmlBeanDefinitionReader
 		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
 
-		// Configure the bean definition reader with this context's
-		// resource loading environment.
+		// 使用该上下文的资源加载环境配置 bean 定义阅读器
 		beanDefinitionReader.setEnvironment(this.getEnvironment());
+		// 将资源加载器设置为当前应用程序上下文
 		beanDefinitionReader.setResourceLoader(this);
+		// 设置实体解析器为 ResourceEntityResolver，用于解析 bean 定义中的实体引用
 		beanDefinitionReader.setEntityResolver(new ResourceEntityResolver(this));
 
-		// Allow a subclass to provide custom initialization of the reader,
-		// then proceed with actually loading the bean definitions.
+		// 允许子类提供对阅读器的自定义初始化，然后继续实际加载 bean 定义
 		initBeanDefinitionReader(beanDefinitionReader);
+		// 调用阅读器的加载方法，实际上会读取配置文件，解析 bean 定义，将它们注册到 bean 工厂中
 		loadBeanDefinitions(beanDefinitionReader);
 	}
 
@@ -119,11 +120,15 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 	 * @see #getResourcePatternResolver
 	 */
 	protected void loadBeanDefinitions(XmlBeanDefinitionReader reader) throws BeansException, IOException {
+		// 获取配置资源（Resource）数组，通常表示通过类路径或其他方式加载的配置文件
 		Resource[] configResources = getConfigResources();
+		// 如果配置资源不为空，则通过阅读器加载这些资源中的 bean 定义
 		if (configResources != null) {
 			reader.loadBeanDefinitions(configResources);
 		}
+		//获取配置文件路径数组，通常表示通过字符串形式指定的配置文件路径
 		String[] configLocations = getConfigLocations();
+		// 如果配置文件路径不为空，则通过阅读器加载这些路径中的 bean 定义
 		if (configLocations != null) {
 			reader.loadBeanDefinitions(configLocations);
 		}

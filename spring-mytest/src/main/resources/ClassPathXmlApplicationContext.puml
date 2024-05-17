@@ -1,0 +1,39 @@
+@startuml
+Title: ClassPathXmlApplicationContext时序图
+ClassPathXmlApplicationContextDemo->>ClassPathXmlApplicationContext:ClassPathXmlApplicationContext(configLocation)
+Note over ClassPathXmlApplicationContextDemo,ClassPathXmlApplicationContext: 创建ClassPathXmlApplicationContext实例
+
+ClassPathXmlApplicationContext->>ClassPathXmlApplicationContext:ClassPathXmlApplicationContext(configLocations,refresh,parent)
+Note over ClassPathXmlApplicationContext: 通过多个配置文件路径、刷新标志和父上下文构造实例
+
+ClassPathXmlApplicationContext->>AbstractApplicationContext:refresh()
+Note over ClassPathXmlApplicationContext,AbstractApplicationContext: 刷新应用程序上下文
+
+AbstractApplicationContext->>AbstractApplicationContext:obtainFreshBeanFactory()
+Note over AbstractApplicationContext: 获取刷新过的bean工厂
+
+AbstractApplicationContext->>AbstractRefreshableApplicationContext:refreshBeanFactory()
+Note over AbstractApplicationContext,AbstractRefreshableApplicationContext: 调用子类的refreshBeanFactory()
+
+AbstractRefreshableApplicationContext->>AbstractXmlApplicationContext:loadBeanDefinitions(beanFactory)
+Note over AbstractRefreshableApplicationContext,AbstractXmlApplicationContext: 调用子类的loadBeanDefinitions方法
+
+AbstractXmlApplicationContext->>XmlBeanDefinitionReader:new XmlBeanDefinitionReader(beanFactory)
+Note over AbstractXmlApplicationContext,XmlBeanDefinitionReader: 创建XmlBeanDefinitionReader实例
+
+XmlBeanDefinitionReader->>AbstractXmlApplicationContext:返回Bean定义读取器
+Note over XmlBeanDefinitionReader,AbstractXmlApplicationContext: 返回Bean定义读取器
+
+AbstractXmlApplicationContext->>AbstractXmlApplicationContext:loadBeanDefinitions(reader)
+Note over AbstractXmlApplicationContext: 调用XmlBeanDefinitionReader的loadBeanDefinitions方法
+
+AbstractXmlApplicationContext->>XmlBeanDefinitionReader:reader.loadBeanDefinitions(configLocations)
+Note over AbstractXmlApplicationContext,XmlBeanDefinitionReader: 加载配置文件中的Bean定义
+
+AbstractApplicationContext->>AbstractRefreshableApplicationContext:getBeanFactory()
+Note over AbstractApplicationContext,AbstractRefreshableApplicationContext: 获取Bean工厂
+
+AbstractRefreshableApplicationContext->>AbstractApplicationContext:返回Bean工厂
+Note over AbstractApplicationContext: 返回Bean工厂
+
+@enduml
